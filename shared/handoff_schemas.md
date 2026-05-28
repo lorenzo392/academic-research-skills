@@ -748,11 +748,15 @@ See `shared/style_calibration_protocol.md` for full consumption rules and confli
 **Optional fields**:
 - `reviewer_source`: Which reviewer originally raised the concern (EIC, R1, R2, R3, DA)
 - `residual_action`: What remains to be done if not fully addressed
+- `commitment_extracted`: (Kong A1 / v3.11) List of `{commitment_text, commitment_type, required_evidence_type}` extracted from `original_comment` by `revision_coach_agent` Step 3.5. `commitment_type ∈ {add_experiment, add_analysis, add_clarification, add_citation, restructure, other}`. Empty list `[]` is valid (comment carried no extractable commitment, e.g., positive feedback).
+- `fulfillment_status`: (Kong A1 / v3.11) Per-commitment status `fulfilled` / `partial` / `not-fulfilled` / `explicitly-rejected-with-rationale`. Surfaced as list parallel to `commitment_extracted`. Omitted when `commitment_extracted` is empty.
+- `unfulfilled_rationale`: (Kong A1 / v3.11) Per-commitment free-text rationale required iff status ∈ `{partial, not-fulfilled, explicitly-rejected-with-rationale}`. Three valid forms: (a) "done elsewhere, see §X" pointer, (b) "rejected, reasons: …" rationale, (c) "deferred to future work" acknowledgment.
 
 **Validation**:
 - Every item from the original Revision Roadmap (Schema 7) must appear in the matrix
 - `authors_claim` cannot be empty for Priority 1 items (flag as `CANNOT_VERIFY` if missing)
 - Matrix is carried forward in Material Passport (Schema 9) for audit trail
+- If `commitment_extracted` is non-empty, `fulfillment_status` must have the same length. For each index `i` where `fulfillment_status[i] ≠ fulfilled`, `unfulfilled_rationale[i]` must be non-empty. Violations surface as `COMMITMENT_GAP` advisory at re-review (advisory only — author retains final responsibility).
 
 ---
 
